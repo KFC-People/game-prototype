@@ -20,7 +20,6 @@ class GameView(arcade.View):
             "anchor_x": "center",
             "color": arcade.color.WHITE,
             "font_name": "monospace",
-            "font_size": 64,
             "bold": True,
         }
 
@@ -41,7 +40,7 @@ class GameView(arcade.View):
     def on_update(self, delta_time: float):
         self.speed_wpm = self.typing_engine.update()
 
-        self.robot.change_x = self.speed_wpm * 0.2
+        self.robot.change_x = self.speed_wpm * 0.05
 
         self.robot.update()
         self.robot.update_animation()
@@ -75,7 +74,53 @@ class GameView(arcade.View):
             f"{self.speed_wpm:.1f} WPM",
             self.window.width // 2,
             self.window.height * 0.8,
+            font_size=64,
             **self.font_config,
+        )
+
+        char = arcade.Text(" ", 0, 0, font_name="monospace", font_size=24)
+        character_width, character_height = char.content_size
+
+        start_x, start_y = self.window.width // 2, self.window.height // 2
+
+        arcade.draw_line(
+            start_x,
+            start_y - 10,
+            start_x,
+            start_y + character_height,
+            color=arcade.color.WHITE,
+        )
+
+        for key_input in self.typing_engine.typing_history[::-1]:
+            char = key_input.key
+            start_x -= character_width
+
+            if key_input.correct:
+                color = arcade.color.GREEN
+            else:
+                color = arcade.color.RED
+
+                if char.isspace():
+                    char = "_"
+
+            arcade.draw_text(
+                char,
+                start_x,
+                start_y,
+                font_name="monospace",
+                font_size=24,
+                anchor_x="left",
+                color=color,
+            )
+
+        arcade.draw_text(
+            "".join(self.typing_engine.prompt),
+            self.window.width // 2,
+            start_y,
+            font_name="monospace",
+            font_size=24,
+            anchor_x="left",
+            color=arcade.color.LIGHT_GRAY,
         )
 
     def on_key_press(self, symbol: int, *_):

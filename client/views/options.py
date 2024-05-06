@@ -25,20 +25,22 @@ class OptionsView(arcade.View):
 
         width, height = self.window.get_size()
 
-        arcade.draw_text(
-            "options menu",
-            start_x=width / 2,
-            start_y=height * 0.9,
-            **self.font_config,
-        )
+        for i, text in enumerate(
+            [
+                "options menu",
+                "",
+                "select an option:",
+                "press <esc> to go back",
+            ],
+            start=2,
+        ):
+            arcade.draw_text(
+                text,
+                start_x=width / 2,
+                start_y=(10 - i) / 10 * height,
+                **self.font_config,
+            )
 
-        arcade.draw_text(
-            "press <esc> to go back",
-            start_x=width / 2,
-            start_y=height * 0.1,
-            **self.font_config,
-        )
-
-    def on_key_press(self, symbol: int, modifiers: int):
+    def on_key_press(self, symbol: int, *_):
         if symbol == arcade.key.ESCAPE:
             self.window.show_view(self.previous_view)

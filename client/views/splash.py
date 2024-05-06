@@ -40,7 +40,7 @@ class SplashView(arcade.View):
         start_x, start_y = width / 2, height / 2
 
         arcade.draw_text(
-            "> fuckfuckfuck",
+            "> typetypetype",
             start_x=start_x,
             start_y=start_y + 25,
             **self.font_config,
