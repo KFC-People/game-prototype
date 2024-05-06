@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "fuckfuckfuck"
+version = "0.1.0"
+description = ""
+authors = ["Andrew Yatsura <andrewyazura203@proton.me>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+arcade = "^2.6.17"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+ruff = "^0.4.3"
+isort = "^5.13.2"
+pre-commit = "^3.7.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
