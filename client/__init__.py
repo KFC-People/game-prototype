@@ -2,8 +2,8 @@ import arcade
 
 from client.views import GameView, MainMenuView, SplashView
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
 SCREEN_TITLE = "fuckfuckfuck client"
 
 

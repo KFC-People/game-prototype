@@ -9,6 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 arcade = "^2.6.17"
+python-lorem = "^1.3.0.post1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.2"

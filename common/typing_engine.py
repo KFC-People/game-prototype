@@ -1,4 +1,7 @@
 import time
+from typing import Iterator
+
+import lorem
 
 TYPING_WINDOW_SECONDS = 3
 CHARS_PER_WORD = 5
@@ -9,7 +12,12 @@ class TypingEngine:
         self.typing_buffer = ""
         self.typing_history = []
 
-        self.game_start_time = time.time()
+        self.prompt = self.generate_prompt()
+
+    def generate_prompt(
+        self,
+    ) -> Iterator[str]:
+        return lorem.paragraph(1)
 
     def update(self) -> float:
         self._remove_old_chars()
