@@ -30,7 +30,7 @@ class MainMenuView(arcade.View):
                 "select an option:",
                 "press <i> to start the game",
                 "press <o> to open the options menu",
-                "press <esc> to quit the game",
+                "press <q> to quit the game",
             ],
             start=2,
         ):
@@ -42,7 +42,7 @@ class MainMenuView(arcade.View):
             )
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
-        if symbol == arcade.key.ESCAPE:
+        if symbol == arcade.key.Q:
             arcade.close_window()
 
         elif symbol == arcade.key.I:

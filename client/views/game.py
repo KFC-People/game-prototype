@@ -1,11 +1,7 @@
-import time
-
 import arcade
 
+from client.typing_engine import TypingEngine
 from client.views.pause import PauseView
-
-TYPING_WINDOW_SECONDS = 5
-CHARS_PER_WORD = 5
 
 
 class Robot(arcade.Sprite):
@@ -46,47 +42,27 @@ class Robot(arcade.Sprite):
         self.texture = self.walk_textures[self.current_texture_index]
 
 
-class TypingEngine:
-    def __init__(self):
-        self.typing_buffer = ""
-        self.typing_history = []
-
-        self.game_start_time = time.time()
-
-    def update(self) -> float:
-        self._remove_old_chars()
-
-        speed_cps = len(self.typing_history) / TYPING_WINDOW_SECONDS
-        speed_wpm = speed_cps * 60 / CHARS_PER_WORD
-
-        return speed_wpm
-
-    def _remove_old_chars(self) -> None:
-        current_time = time.time()
-
-        self.typing_history = [
-            time
-            for time in self.typing_history
-            if current_time - time < TYPING_WINDOW_SECONDS
-        ]
-
-    def handle_char(self, char: str) -> None:
-        self.typing_buffer += char
-        self.typing_history.append(time.time())
-
-
 class GameView(arcade.View):
     def __init__(self, window: arcade.Window = None):
         super().__init__(window)
 
         self.camera = None
+        self.gui_camera = None
         self.robot = None
         self.background = None
         self.typing_engine = None
         self.speed_wpm = 0.0
 
+        self.font_config = {
+            "anchor_x": "center",
+            "color": arcade.color.GREEN,
+            "font_name": "monospace",
+            "font_size": 64,
+        }
+
     def on_show_view(self):
         self.camera = arcade.Camera(self.window.width, self.window.height)
+        self.gui_camera = arcade.Camera(self.window.width, self.window.height)
 
         self.robot = Robot()
         self.robot.center_x = 64
@@ -101,14 +77,15 @@ class GameView(arcade.View):
     def on_update(self, delta_time: float):
         self.speed_wpm = self.typing_engine.update()
 
-        self.robot.change_x = self.speed_wpm
+        self.robot.change_x = self.speed_wpm * 0.2
+
         self.robot.update()
         self.robot.update_animation()
 
         self._update_camera()
 
     def _update_camera(self):
-        self.camera.move_to((self.robot.center_x - self.window.width // 2, 0), 0.7)
+        self.camera.move_to((self.robot.center_x - self.window.width // 2, 0), 0.6)
 
     def on_draw(self):
         self.clear()
@@ -127,6 +104,15 @@ class GameView(arcade.View):
             )
 
         self.robot.draw()
+
+        self.gui_camera.use()
+
+        arcade.draw_text(
+            f"{self.speed_wpm:.1f} WPM",
+            self.window.width // 2,
+            self.window.height * 0.8,
+            **self.font_config,
+        )
 
     def on_key_press(self, symbol: int, *_):
         if symbol == arcade.key.ESCAPE:
