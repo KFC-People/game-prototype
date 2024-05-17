@@ -1,11 +1,11 @@
 import arcade
 
+from client.views.main_menu import MainMenuView
+
 
 class SplashView(arcade.View):
-    def __init__(self, next_view: arcade.View, window: arcade.Window = None):
+    def __init__(self, window: arcade.Window = None):
         super().__init__(window)
-
-        self.next_view = next_view
 
         self.font_config = {
             "anchor_x": "center",
@@ -57,4 +57,4 @@ class SplashView(arcade.View):
 
     def on_key_press(self, symbol: int, *_):
         if symbol == arcade.key.I:
-            self.window.show_view(self.next_view)
+            self.window.show_view(MainMenuView())

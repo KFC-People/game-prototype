@@ -1,6 +1,6 @@
 import arcade
 
-from client.views import GameView, MainMenuView, SplashView
+from client.views import GameView, SplashView
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
@@ -12,7 +12,7 @@ def run_game(update_rate: float = 1 / 60):
     window.set_update_rate(update_rate)
 
     window.game_view = GameView()
-    splash_view = SplashView(MainMenuView())
+    splash_view = SplashView()
 
     window.show_view(splash_view)
     arcade.run()

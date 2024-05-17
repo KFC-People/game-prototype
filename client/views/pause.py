@@ -16,7 +16,6 @@ class PauseView(arcade.View):
         }
 
     def on_show_view(self):
-
         arcade.set_background_color(arcade.color.SMOKY_BLACK)
 
     def on_update(self, delta_time: float):

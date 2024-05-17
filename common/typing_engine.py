@@ -1,7 +1,7 @@
 import time
 from dataclasses import dataclass
 
-import lorem
+# import lorem
 
 TYPING_WINDOW_SECONDS = 3
 CHARS_PER_WORD = 5
@@ -25,7 +25,8 @@ class TypingEngine:
     def generate_prompt(
         self,
     ) -> list[str]:
-        return list(lorem.get_paragraph(1).lower())
+        return ""
+        # return list(lorem.get_paragraph(1).lower())
 
     def update(self) -> float:
         if len(self.prompt) < self.speed_cps * TYPING_WINDOW_SECONDS:
