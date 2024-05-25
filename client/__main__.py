@@ -1,6 +1,4 @@
-# from client import run_game
-from client.client import run
+from client import run_game
 
 if __name__ == "__main__":
-    # run_game()
-    run()
+    run_game()
