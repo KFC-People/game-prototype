@@ -16,7 +16,7 @@ class GameView(arcade.View):
 
         self.background_layers = []
         self.layer_positions = [0] * 5
-        self.layer_speeds = [0, 0.5, 0.75, 1, 1.5]
+        self.layer_speeds = [0, 0.05, 0.1, 0.15, 0.2]
 
     def on_show_view(self) -> None:
         self.camera = arcade.Camera(self.window.width, self.window.height)
@@ -34,16 +34,20 @@ class GameView(arcade.View):
 
     def on_update(self, delta_time: float) -> None:
         self.vehicle.update(delta_time)
+        camera_position = self.vehicle.position - Vec2d(128, 150)
+        self.camera.move_to(camera_position, 0.1)
 
         for i in range(len(self.layer_positions)):
             self.layer_positions[i] -= self.layer_speeds[i] * self.vehicle.velocity.x
 
     def on_draw(self):
         self.clear()
-        self.camera.use()
+
+        self.gui_camera.use()
 
         height = self.window.height
         width = self.window.width
+        road_height = 100
 
         for i, texture in enumerate(self.background_layers):
             if i == 0:
@@ -51,31 +55,31 @@ class GameView(arcade.View):
                 continue
 
             x = self.layer_positions[i] % width
-            arcade.draw_lrwh_rectangle_textured(x, 0, width, height, texture)
-            arcade.draw_lrwh_rectangle_textured(x - width, 0, width, height, texture)
+            arcade.draw_lrwh_rectangle_textured(x, road_height, width, height, texture)
+            arcade.draw_lrwh_rectangle_textured(
+                x - width, road_height, width, height, texture
+            )
 
-        road_height = 100
         arcade.draw_rectangle_filled(
             width / 2,
             road_height / 2,
             width,
             road_height,
-            arcade.color.LIGHT_GRAY,
+            arcade.color.DARK_MIDNIGHT_BLUE,
         )
-
-        self.vehicle.draw()
-
-        self.gui_camera.use()
 
         arcade.draw_text(
             self.vehicle.prompt,
             width / 2,
             50,
-            arcade.color.BLACK,
+            arcade.color.WHITE,
             font_size=25,
             font_name="FiraCode Nerd Font",  # TODO: load font from assets
             bold=True,
         )
+
+        self.camera.use()
+        self.vehicle.draw()
 
     def on_key_press(self, symbol: int, *_) -> None:
         if symbol == arcade.key.ESCAPE:
