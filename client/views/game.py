@@ -1,4 +1,5 @@
 import arcade
+from pymunk import Vec2d
 
 from client.views.pause import PauseView
 from common.vehicle import Vehicle
@@ -12,7 +13,6 @@ class GameView(arcade.View):
         self.gui_camera = None
 
         self.vehicle = None
-        self.scene = None
 
         self.background_layers = []
         self.layer_positions = [0] * 5
@@ -22,12 +22,11 @@ class GameView(arcade.View):
         self.camera = arcade.Camera(self.window.width, self.window.height)
         self.gui_camera = arcade.Camera(self.window.width, self.window.height)
 
-        self.vehicle = Vehicle()
-        self.vehicle.center_x = 64
-        self.vehicle.center_y = 64
-
-        self.scene = arcade.Scene()
-        self.scene.add_sprite("vehicle", self.vehicle)
+        self.vehicle = Vehicle(
+            initial_position=Vec2d(128, 150),
+            mass=10,
+            scale=2,
+        )
 
         self.background_layers = [
             arcade.load_texture(f"assets/backgrounds/city/{i}.png") for i in range(1, 6)
@@ -37,7 +36,7 @@ class GameView(arcade.View):
         self.vehicle.update(delta_time)
 
         for i in range(len(self.layer_positions)):
-            self.layer_positions[i] -= self.layer_speeds[i] * self.vehicle.change_x
+            self.layer_positions[i] -= self.layer_speeds[i] * self.vehicle.velocity.x
 
     def on_draw(self):
         self.clear()
@@ -55,16 +54,27 @@ class GameView(arcade.View):
             arcade.draw_lrwh_rectangle_textured(x, 0, width, height, texture)
             arcade.draw_lrwh_rectangle_textured(x - width, 0, width, height, texture)
 
-        self.scene.draw()
+        road_height = 100
+        arcade.draw_rectangle_filled(
+            width / 2,
+            road_height / 2,
+            width,
+            road_height,
+            arcade.color.LIGHT_GRAY,
+        )
+
+        self.vehicle.draw()
 
         self.gui_camera.use()
 
         arcade.draw_text(
-            self.vehicle.health,
-            10,
-            self.window.height - 100,
+            self.vehicle.prompt,
+            width / 2,
+            50,
             arcade.color.BLACK,
-            100,
+            font_size=25,
+            font_name="FiraCode Nerd Font",  # TODO: load font from assets
+            bold=True,
         )
 
     def on_key_press(self, symbol: int, *_) -> None:
@@ -72,4 +82,4 @@ class GameView(arcade.View):
             self.window.show_view(PauseView(self))
 
         elif " " <= (char := chr(symbol)) <= "~":
-            self.vehicle.typing_component.handle_char(char)
+            self.vehicle.handle_char(char)

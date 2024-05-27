@@ -11,9 +11,13 @@ class Component:
         raise NotImplementedError
 
 
-class GameObject(arcade.Sprite):
-    def __init__(self) -> None:
-        super().__init__()
+class ArcadeGraphicsComponent(arcade.Sprite, Component):
+    def __init__(self, parent: "GameObject", **kwargs) -> None:
+        super().__init__(**kwargs)
 
+        self.parent = parent
+
+
+class GameObject:
     def update(self, delta_time: float) -> Any:
         raise NotImplementedError

@@ -1,10 +1,15 @@
-from enum import Enum
 import time
 from dataclasses import dataclass
+from enum import Enum
 
 import arcade
+from pymunk import Vec2d
 
-from common.game_object import Component, GameObject
+from common.game_object import (
+    ArcadeGraphicsComponent,
+    Component,
+    GameObject,
+)
 
 
 class State(Enum):
@@ -24,7 +29,7 @@ class KeyInput:
 class TypingComponent(Component):
     def __init__(
         self, parent: GameObject, window_seconds: int = 5, chars_per_word: int = 6
-    ):
+    ) -> None:
         super().__init__(parent)
 
         self.window_seconds = window_seconds
@@ -32,12 +37,34 @@ class TypingComponent(Component):
 
         self.typing_history = []
         self.prompt = []
+        self.prompt = list(
+            "hello world lorem ipsum dolor sit amet consectetur adipiscing elit "
+        )
+        self.prompt += list(
+            "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua "
+        )
+        self.prompt += list(
+            "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat "
+        )
+        self.prompt += list(
+            "duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur "
+        )
+        self.prompt += list(
+            "excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum "
+        )
+
+        self.speed_wpm = 0
+        self.accuracy = 0
 
     def update(self, delta_time: float) -> None:
         self._clear_history()
-        self.parent.speed_wpm = self._get_speed()
+        self.speed_wpm, self.accuracy = self._get_stats()
 
     def handle_char(self, char: str) -> None:
+        # ignore spaces between words
+        if char != " " and self.prompt and self.prompt[0] == " ":
+            self.prompt.pop(0)
+
         self.typing_history.append(
             KeyInput(
                 char,
@@ -45,17 +72,18 @@ class TypingComponent(Component):
                 time.perf_counter(),
             )
         )
-        self.parent.health -= 1
 
-    def _get_speed(self) -> float:
+    def _get_stats(self) -> tuple[float, float]:
         if not self.typing_history:
-            return 0
+            return 0, 0
 
         correct_chars = sum(key.correct for key in self.typing_history)
+        accuracy = correct_chars / len(self.typing_history)
+
         speed_cps = correct_chars / self.window_seconds
         speed_wpm = speed_cps * 60 / self.chars_per_word
 
-        return speed_wpm
+        return speed_wpm, accuracy
 
     def _clear_history(self) -> None:
         current_time = time.perf_counter()
@@ -68,29 +96,36 @@ class TypingComponent(Component):
 
 
 class MovementComponent(Component):
-    def update(self, delta_time: float) -> None:
-        if self.parent.health <= 0:
-            if self.parent.state not in (
-                State.DYING,
-                State.DEAD,
-            ):
-                self.parent.state = State.DYING
-                self.parent.change_x = 0
+    def __init__(
+        self,
+        parent: GameObject,
+        initial_position: Vec2d = Vec2d.zero(),
+        mass: float = 1,
+    ) -> None:
+        super().__init__(parent)
 
+        self.mass = mass
+
+        self.position = initial_position
+        self.velocity = Vec2d.zero()
+        self.acceleration = Vec2d.zero()
+
+    def update(self, delta_time: float) -> None:
+        if self.parent.state == State.DYING:
             return
 
-        self.parent.change_x = self.parent.speed_wpm * 0.1
+        self.acceleration += Vec2d(1, 0) * self.parent.typing_speed / self.mass
+        self.acceleration -= self.velocity * 0.3
 
-        if self.parent.change_x > 0:
-            self.parent.state = State.DRIVING
+        self.velocity += self.acceleration * delta_time
+        self.position += self.velocity * delta_time
 
-        else:
-            self.parent.state = State.IDLE
+        self.acceleration = Vec2d.zero()
 
 
-class GraphicsComponent(Component):
-    def __init__(self, parent: GameObject):
-        super().__init__(parent)
+class GraphicsComponent(ArcadeGraphicsComponent):
+    def __init__(self, parent: GameObject, **kwargs) -> None:
+        super().__init__(parent, **kwargs)
 
         main_path = "assets/auto"
 
@@ -149,11 +184,11 @@ class GraphicsComponent(Component):
             if current_sprite == 5:
                 self.parent.state = State.DEAD
 
-            self.parent.texture = self.death_texture[current_sprite]
+            self.texture = self.death_texture[current_sprite]
             return
 
         elif self.parent.state == State.DEAD:
-            self.parent.texture = self.death_texture[5]
+            self.texture = self.death_texture[5]
             return
 
         self.current_frame %= self.sprite_count * self.frames_per_sprite
@@ -161,24 +196,54 @@ class GraphicsComponent(Component):
 
         match self.parent.state:
             case State.IDLE:
-                self.parent.texture = self.idle_texture[current_sprite]
+                self.texture = self.idle_texture[current_sprite]
 
             case State.DRIVING:
-                self.parent.texture = self.drive_texture[current_sprite]
+                self.texture = self.drive_texture[current_sprite]
 
 
 class Vehicle(GameObject):
-    def __init__(self):
+    def __init__(
+        self, initial_position: Vec2d = Vec2d.zero(), mass: float = 1, scale: float = 1
+    ) -> None:
         super().__init__()
 
         self.state = State.IDLE
         self.health = 100
 
         self.typing_component = TypingComponent(self)
-        self.movement_component = MovementComponent(self)
-        self.graphics_component = GraphicsComponent(self)
+        self.movement_component = MovementComponent(
+            self, initial_position=initial_position, mass=mass
+        )
+        self.graphics_component = GraphicsComponent(self, scale=scale)
 
     def update(self, delta_time: float) -> None:
+        if self.health <= 0:
+            if self.state not in (
+                State.DYING,
+                State.DEAD,
+            ):
+                self.state = State.DYING
+
         self.typing_component.update(delta_time)
         self.movement_component.update(delta_time)
         self.graphics_component.update(delta_time)
+
+    def handle_char(self, char: str) -> None:
+        self.typing_component.handle_char(char)
+
+    def draw(self) -> None:
+        self.graphics_component.position = self.movement_component.position.int_tuple
+        self.graphics_component.draw()
+
+    @property
+    def velocity(self) -> Vec2d:
+        return self.movement_component.velocity
+
+    @property
+    def typing_speed(self) -> float:
+        return self.typing_component.speed_wpm
+
+    @property
+    def prompt(self) -> list[str]:
+        return "".join(self.typing_component.prompt)
