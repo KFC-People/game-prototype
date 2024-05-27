@@ -1,6 +1,7 @@
 from typing import Any
 
 import arcade
+from pymunk import Vec2d
 
 
 class Component:
@@ -11,7 +12,23 @@ class Component:
         raise NotImplementedError
 
 
-class ArcadeGraphicsComponent(arcade.Sprite, Component):
+class BaseMovementComponent(Component):
+    def __init__(
+        self,
+        parent: "GameObject",
+        initial_position: Vec2d = Vec2d.zero(),
+        mass: float = 1,
+    ) -> None:
+        super().__init__(parent)
+
+        self.mass = mass
+
+        self.position = initial_position
+        self.velocity = Vec2d.zero()
+        self.acceleration = Vec2d.zero()
+
+
+class BaseGraphicsComponent(arcade.Sprite, Component):
     def __init__(self, parent: "GameObject", **kwargs) -> None:
         super().__init__(**kwargs)
 

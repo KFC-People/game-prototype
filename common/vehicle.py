@@ -6,7 +6,8 @@ import arcade
 from pymunk import Vec2d
 
 from common.game_object import (
-    ArcadeGraphicsComponent,
+    BaseGraphicsComponent,
+    BaseMovementComponent,
     Component,
     GameObject,
 )
@@ -61,6 +62,10 @@ class TypingComponent(Component):
         self.speed_wpm, self.accuracy = self._get_stats()
 
     def handle_char(self, char: str) -> None:
+        if not self.prompt:
+            # TODO: renew prompt
+            return
+
         # ignore spaces between words
         if char != " " and self.prompt and self.prompt[0] == " ":
             self.prompt.pop(0)
@@ -68,7 +73,7 @@ class TypingComponent(Component):
         self.typing_history.append(
             KeyInput(
                 char,
-                (char == self.prompt.pop(0)) if self.prompt else True,
+                char == self.prompt.pop(0),
                 time.perf_counter(),
             )
         )
@@ -95,26 +100,12 @@ class TypingComponent(Component):
         ]
 
 
-class MovementComponent(Component):
-    def __init__(
-        self,
-        parent: GameObject,
-        initial_position: Vec2d = Vec2d.zero(),
-        mass: float = 1,
-    ) -> None:
-        super().__init__(parent)
-
-        self.mass = mass
-
-        self.position = initial_position
-        self.velocity = Vec2d.zero()
-        self.acceleration = Vec2d.zero()
-
+class MovementComponent(BaseMovementComponent):
     def update(self, delta_time: float) -> None:
         if self.parent.state == State.DYING:
             return
 
-        self.acceleration += Vec2d(1, 0) * self.parent.typing_speed / self.mass
+        self.acceleration += Vec2d(1, 0) * self.parent.typing_speed
         self.acceleration -= self.velocity * 0.3
 
         self.velocity += self.acceleration * delta_time
@@ -123,7 +114,7 @@ class MovementComponent(Component):
         self.acceleration = Vec2d.zero()
 
 
-class GraphicsComponent(ArcadeGraphicsComponent):
+class GraphicsComponent(BaseGraphicsComponent):
     def __init__(self, parent: GameObject, **kwargs) -> None:
         super().__init__(parent, **kwargs)
 
@@ -175,6 +166,7 @@ class GraphicsComponent(ArcadeGraphicsComponent):
         self.current_frame = 0
 
     def update(self, delta_time: float) -> None:
+        self.position = self.parent.position
         self.current_frame += 1
 
         if self.parent.state == State.DYING:
@@ -233,8 +225,11 @@ class Vehicle(GameObject):
         self.typing_component.handle_char(char)
 
     def draw(self) -> None:
-        self.graphics_component.position = self.movement_component.position.int_tuple
         self.graphics_component.draw()
+
+    @property
+    def position(self) -> Vec2d:
+        return self.movement_component.position
 
     @property
     def velocity(self) -> Vec2d:

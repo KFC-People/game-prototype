@@ -1,6 +1,11 @@
 import arcade
 
-from common.game_object import Component, GameObject
+from common.game_object import (
+    BaseGraphicsComponent,
+    BaseMovementComponent,
+    Component,
+    GameObject,
+)
 
 
 class TypingComponent(Component):
@@ -11,24 +16,21 @@ class TypingComponent(Component):
         self.health = len(self.prompt)
 
     def handle_char(self, char: str) -> None:
+        if not self.prompt:
+            # TODO: renew prompt instead of returning
+            return
+
         if char == self.prompt[0]:
             self.prompt.pop(0)
             self.health -= 1
 
-        else:
-            self.health += 1
 
-        if not self.prompt:
-            # renew prompt
-            return
-
-
-class MovementComponent(Component):
+class MovementComponent(BaseMovementComponent):
     def update(self, delta_time: float) -> None:
         pass
 
 
-class GraphicsComponent(Component):
+class GraphicsComponent(BaseGraphicsComponent):
     def __init__(self, parent: GameObject) -> None:
         super().__init__(parent)
 
@@ -57,6 +59,7 @@ class GraphicsComponent(Component):
         self.current_frame = 0
 
     def update(self, delta_time: float) -> None:
+        self.position = self.parent.position
         self.current_frame += 1
         self.current_frame %= self.sprite_count * self.frames_per_sprite
 
@@ -76,3 +79,10 @@ class Enemy(GameObject):
     def update(self, delta_time: float) -> None:
         self.movement_component.update(delta_time)
         self.graphics_component.update(delta_time)
+
+    def draw(self) -> None:
+        self.graphics_component.draw()
+
+    @property
+    def position(self):
+        return self.movement_component.position
