@@ -1,6 +1,6 @@
 import time
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, auto
 
 import arcade
 from pymunk import Vec2d
@@ -11,13 +11,14 @@ from common.game_object import (
     Component,
     GameObject,
 )
+from common.utils import map_exponential
 
 
 class State(Enum):
-    IDLE = 1
-    DRIVING = 2
-    DYING = 3
-    DEAD = 4
+    IDLE = auto()
+    DRIVING = auto()
+    DYING = auto()
+    DEAD = auto()
 
 
 @dataclass
@@ -71,11 +72,7 @@ class TypingComponent(Component):
             self.prompt.pop(0)
 
         self.typing_history.append(
-            KeyInput(
-                char,
-                char == self.prompt.pop(0),
-                time.perf_counter(),
-            )
+            KeyInput(char, char == self.prompt.pop(0), time.perf_counter())
         )
 
     def _get_stats(self) -> tuple[float, float]:
@@ -102,11 +99,12 @@ class TypingComponent(Component):
 
 class MovementComponent(BaseMovementComponent):
     def update(self, delta_time: float) -> None:
-        if self.parent.state == State.DYING:
-            return
+        if self.parent.state in {State.DYING, State.DEAD}:
+            self.acceleration -= self.velocity
 
-        self.acceleration += Vec2d(1, 0) * self.parent.typing_speed
-        self.acceleration -= self.velocity * 0.3
+        else:
+            self.acceleration += Vec2d(1, 0) * self.parent.typing_speed
+            self.acceleration -= self.velocity * 0.4
 
         self.velocity += self.acceleration * delta_time
         self.position += self.velocity * delta_time
@@ -120,7 +118,7 @@ class GraphicsComponent(BaseGraphicsComponent):
 
         main_path = "assets/auto"
 
-        self.frames_per_sprite = 4
+        self.frames_per_sprite = 12
         self.sprite_count = 4
 
         spritesheet_args = (96, 96, 4, self.sprite_count)
@@ -180,7 +178,7 @@ class GraphicsComponent(BaseGraphicsComponent):
             return
 
         elif self.parent.state == State.DEAD:
-            self.texture = self.death_texture[5]
+            self.texture = self.death_texture[-1]
             return
 
         self.current_frame %= self.sprite_count * self.frames_per_sprite
@@ -196,7 +194,10 @@ class GraphicsComponent(BaseGraphicsComponent):
 
 class Vehicle(GameObject):
     def __init__(
-        self, initial_position: Vec2d = Vec2d.zero(), mass: float = 1, scale: float = 1
+        self,
+        initial_position: Vec2d = Vec2d.zero(),
+        mass: float = 1.0,
+        scale: float = 1.0,
     ) -> None:
         super().__init__()
 
@@ -204,17 +205,35 @@ class Vehicle(GameObject):
         self.health = 100
 
         self.typing_component = TypingComponent(self)
-        self.movement_component = MovementComponent(
-            self, initial_position=initial_position, mass=mass
+        self.movement_component = MovementComponent(self, mass=mass)
+        self.graphics_component = GraphicsComponent(
+            self, initial_position=initial_position, scale=scale
         )
-        self.graphics_component = GraphicsComponent(self, scale=scale)
 
     def update(self, delta_time: float) -> None:
-        if self.health <= 0:
-            if self.state not in (
-                State.DYING,
-                State.DEAD,
-            ):
+        if self.state == State.IDLE:
+            if self.velocity.length > 0:
+                self.state = State.DRIVING
+
+        if self.state == State.DRIVING:
+            if self.velocity.length > 1:
+                frames_per_sprite = map_exponential(
+                    self.velocity.length,
+                    in_min=1,
+                    in_max=200,
+                    out_min=1,
+                    out_max=12,
+                    alpha=-2,
+                )
+
+                self.graphics_component.frames_per_sprite = int(frames_per_sprite)
+
+            elif self.velocity.length <= 1:
+                self.graphics_component.frames_per_sprite = 24
+                self.state = State.IDLE
+
+        if self.state != State.DEAD:
+            if self.health <= 0:
                 self.state = State.DYING
 
         self.typing_component.update(delta_time)
