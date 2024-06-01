@@ -1,3 +1,6 @@
+[tool.black]
+skip-magic-trailing-comma = true
+
 [tool.poetry]
 name = "fuckfuckfuck"
 version = "0.1.0"
