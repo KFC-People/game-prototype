@@ -4,7 +4,7 @@ from client.views.main_menu import MainMenuView
 
 
 class SplashView(arcade.View):
-    def __init__(self, window: arcade.Window = None):
+    def __init__(self, window: arcade.Window | None = None):
         super().__init__(window)
 
         self.font_config = {
@@ -40,10 +40,7 @@ class SplashView(arcade.View):
         start_x, start_y = width / 2, height / 2
 
         arcade.draw_text(
-            "> typetypetype",
-            start_x=start_x,
-            start_y=start_y + 25,
-            **self.font_config,
+            "> typetypetype", start_x=start_x, start_y=start_y + 25, **self.font_config
         )
 
         arcade.draw_text(

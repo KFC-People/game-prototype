@@ -2,7 +2,7 @@ import arcade
 
 
 class OptionsView(arcade.View):
-    def __init__(self, previous_view: arcade.View, window: arcade.Window = None):
+    def __init__(self, previous_view: arcade.View, window: arcade.Window | None = None):
         super().__init__(window)
 
         self.font_config = {
@@ -26,13 +26,7 @@ class OptionsView(arcade.View):
         width, height = self.window.get_size()
 
         for i, text in enumerate(
-            [
-                "options menu",
-                "",
-                "select an option:",
-                "press <esc> to go back",
-            ],
-            start=2,
+            ["options menu", "", "select an option:", "press <esc> to go back"], start=2
         ):
             arcade.draw_text(
                 text,

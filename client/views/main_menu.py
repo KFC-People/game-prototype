@@ -4,10 +4,7 @@ from client.views.options import OptionsView
 
 
 class MainMenuView(arcade.View):
-    def __init__(
-        self,
-        window: arcade.Window = None,
-    ) -> None:
+    def __init__(self, window: arcade.Window | None = None) -> None:
         super().__init__(window)
 
         self.font_config = {
