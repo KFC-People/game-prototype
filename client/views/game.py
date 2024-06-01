@@ -2,6 +2,7 @@ import arcade
 from pymunk import Vec2d
 
 from client.views.pause import PauseView
+from common.enemy import Enemy
 from common.vehicle import Vehicle
 
 
@@ -13,6 +14,7 @@ class GameView(arcade.View):
         self.gui_camera = None
 
         self.vehicle = None
+        self.enemies = None
 
         self.background_layers = []
         self.layer_positions = [0] * 5
@@ -22,11 +24,12 @@ class GameView(arcade.View):
         self.camera = arcade.Camera(self.window.width, self.window.height)
         self.gui_camera = arcade.Camera(self.window.width, self.window.height)
 
-        self.vehicle = Vehicle(
-            initial_position=Vec2d(128, 150),
-            mass=10,
-            scale=2,
-        )
+        self.vehicle_screen_position = Vec2d(200, 135)
+        self.vehicle = Vehicle(self.vehicle_screen_position, mass=10, scale=2)
+        self.camera.move(self.vehicle_screen_position)
+
+        self.enemies: list[Enemy] = []
+        self.enemies.append(Enemy(Vec2d(500, 135), scale=2))
 
         self.background_layers = [
             arcade.load_texture(f"assets/backgrounds/city/{i}.png") for i in range(1, 6)
@@ -34,7 +37,10 @@ class GameView(arcade.View):
 
     def on_update(self, delta_time: float) -> None:
         self.vehicle.update(delta_time)
-        camera_position = self.vehicle.position - Vec2d(128, 150)
+        for enemy in self.enemies:
+            enemy.update(delta_time)
+
+        camera_position = self.vehicle.position - self.vehicle_screen_position
         self.camera.move_to(camera_position, 0.1)
 
         for i in range(len(self.layer_positions)):
@@ -71,12 +77,24 @@ class GameView(arcade.View):
         arcade.draw_text(
             self.vehicle.prompt,
             width / 2,
-            50,
+            38,
             arcade.color.WHITE,
             font_size=25,
             font_name="FiraCode Nerd Font",  # TODO: load font from assets
             bold=True,
         )
+
+        for enemy in self.enemies:
+            enemy.draw()
+            arcade.draw_text(
+                enemy.prompt,
+                enemy.position.x - 25,
+                enemy.position.y + 50,
+                arcade.color.WHITE,
+                font_size=16,
+                font_name="FiraCode Nerd Font",
+                bold=True,
+            )
 
         self.camera.use()
         self.vehicle.draw()
@@ -87,3 +105,6 @@ class GameView(arcade.View):
 
         elif " " <= (char := chr(symbol)) <= "~":
             self.vehicle.handle_char(char)
+
+            if current_enemy := self.enemies[0]:
+                current_enemy.handle_char(char)

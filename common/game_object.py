@@ -29,10 +29,11 @@ class BaseMovementComponent(Component):
 
 
 class BaseGraphicsComponent(arcade.Sprite, Component):
-    def __init__(self, parent: "GameObject", **kwargs) -> None:
+    def __init__(self, parent: "GameObject", initial_position: Vec2d, **kwargs) -> None:
         super().__init__(**kwargs)
 
         self.parent = parent
+        self.center_x, self.center_y = initial_position.int_tuple
 
 
 class GameObject:
