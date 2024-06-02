@@ -32,7 +32,9 @@ class TypingComponent(Component):
 
 
 class AIMovementComponent(BaseMovementComponent):
-    def __init__(self, parent: GameObject, initial_position: Vec2d = Vec2d.zero()):
+    def __init__(
+        self, parent: GameObject, initial_position: Vec2d = Vec2d.zero()
+    ) -> None:
         super().__init__(parent, initial_position=initial_position)
 
     def update(self, delta_time: float) -> None:
@@ -123,7 +125,9 @@ class GraphicsComponent(BaseGraphicsComponent):
 
 
 class Enemy(GameObject):
-    def __init__(self, initial_position: Vec2d = Vec2d.zero(), scale: float = 1.0):
+    def __init__(
+        self, initial_position: Vec2d = Vec2d.zero(), scale: float = 1.0
+    ) -> None:
         super().__init__()
 
         self.typing_component = TypingComponent(self)
@@ -161,3 +165,7 @@ class Enemy(GameObject):
     @property
     def is_alive(self) -> bool:
         return self.state not in {State.DYING, State.DEAD}
+
+    @property
+    def is_dead(self) -> bool:
+        return self.state == State.DEAD

@@ -42,7 +42,7 @@ class GameView(arcade.View):
     def on_update(self, delta_time: float) -> None:
         self.vehicle.update(delta_time)
 
-        if self.current_enemy is not None and not self.current_enemy.is_alive:
+        if self.current_enemy is not None and self.current_enemy.is_dead:
             self.enemies.remove(self.current_enemy)
             self.current_enemy = None
 
@@ -55,7 +55,7 @@ class GameView(arcade.View):
         for i in range(len(self.layer_positions)):
             self.layer_positions[i] -= self.layer_speeds[i] * self.vehicle.velocity.x
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         self.clear()
 
         self.gui_camera.use()
@@ -121,4 +121,5 @@ class GameView(arcade.View):
                         self.current_enemy = enemy
                         break
 
-            self.current_enemy.handle_char(char)
+            if self.current_enemy:
+                self.current_enemy.handle_char(char)
