@@ -28,8 +28,12 @@ class GameView(arcade.View):
         self.vehicle = Vehicle(self.vehicle_screen_position, mass=10, scale=2)
         self.camera.move(self.vehicle_screen_position)
 
+        self.current_enemy: Enemy | None = None
         self.enemies: list[Enemy] = []
-        self.enemies.append(Enemy(Vec2d(500, 135), scale=2))
+        self.enemies.append(Enemy(Vec2d(500, 200), scale=2))
+        self.enemies.append(Enemy(Vec2d(700, 200), scale=2))
+        self.enemies.append(Enemy(Vec2d(500, 400), scale=2))
+        self.enemies.append(Enemy(Vec2d(700, 400), scale=2))
 
         self.background_layers = [
             arcade.load_texture(f"assets/backgrounds/city/{i}.png") for i in range(1, 6)
@@ -37,6 +41,11 @@ class GameView(arcade.View):
 
     def on_update(self, delta_time: float) -> None:
         self.vehicle.update(delta_time)
+
+        if self.current_enemy is not None and not self.current_enemy.is_alive:
+            self.enemies.remove(self.current_enemy)
+            self.current_enemy = None
+
         for enemy in self.enemies:
             enemy.update(delta_time)
 
@@ -106,5 +115,10 @@ class GameView(arcade.View):
         elif " " <= (char := chr(symbol)) <= "~":
             self.vehicle.handle_char(char)
 
-            if current_enemy := self.enemies[0]:
-                current_enemy.handle_char(char)
+            if self.current_enemy is None or not self.current_enemy.is_alive:
+                for enemy in self.enemies:
+                    if enemy.is_alive:
+                        self.current_enemy = enemy
+                        break
+
+            self.current_enemy.handle_char(char)

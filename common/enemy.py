@@ -21,16 +21,14 @@ class TypingComponent(Component):
     def __init__(self, parent: GameObject) -> None:
         super().__init__(parent)
 
-        self.prompt = list("hello")
+        self.prompt = list("verylongwordhere")
 
     def handle_char(self, char: str) -> None:
-        if not self.prompt:
-            # TODO: renew prompt instead of returning
+        if len(self.prompt) == 0:
             return
 
         if char == self.prompt[0]:
             self.prompt.pop(0)
-            self.parent.health -= 1
 
 
 class AIMovementComponent(BaseMovementComponent):
@@ -38,7 +36,7 @@ class AIMovementComponent(BaseMovementComponent):
         super().__init__(parent, initial_position=initial_position)
 
     def update(self, delta_time: float) -> None:
-        if self.parent.state in {State.DYING, State.DEAD}:
+        if not self.parent.is_alive:
             self.acceleration += Vec2d(-0.1, -0.4) * self.mass
 
         self.velocity += self.acceleration
@@ -137,11 +135,10 @@ class Enemy(GameObject):
         )
 
         self.state = State.IDLE
-        self.health = len(self.prompt)
 
     def update(self, delta_time: float) -> None:
         if self.state != State.DEAD:
-            if self.health <= 0:
+            if len(self.prompt) == 0:
                 self.state = State.DYING
 
         self.ai_movement_component.update(delta_time)
@@ -160,3 +157,7 @@ class Enemy(GameObject):
     @property
     def prompt(self) -> list[str]:
         return "".join(self.typing_component.prompt)
+
+    @property
+    def is_alive(self) -> bool:
+        return self.state not in {State.DYING, State.DEAD}
