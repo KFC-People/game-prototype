@@ -2,12 +2,13 @@
 skip-magic-trailing-comma = true
 
 [tool.poetry]
-name = "fuckfuckfuck"
+name = "typetypetype"
 version = "0.1.0"
 description = ""
 authors = ["Andrew Yatsura <andrewyazura203@proton.me>"]
 license = "MIT"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
