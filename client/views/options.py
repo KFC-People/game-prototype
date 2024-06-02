@@ -2,7 +2,9 @@ import arcade
 
 
 class OptionsView(arcade.View):
-    def __init__(self, previous_view: arcade.View, window: arcade.Window | None = None):
+    def __init__(
+        self, previous_view: arcade.View, window: arcade.Window | None = None
+    ) -> None:
         super().__init__(window)
 
         self.font_config = {
@@ -14,13 +16,13 @@ class OptionsView(arcade.View):
 
         self.previous_view = previous_view
 
-    def on_show_view(self):
+    def on_show_view(self) -> None:
         arcade.set_background_color(arcade.color.SMOKY_BLACK)
 
-    def on_update(self, delta_time: float):
+    def on_update(self, delta_time: float) -> None:
         pass
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         self.clear()
 
         width, height = self.window.get_size()
@@ -35,6 +37,6 @@ class OptionsView(arcade.View):
                 **self.font_config,
             )
 
-    def on_key_press(self, symbol: int, *_):
+    def on_key_press(self, symbol: int, *_) -> None:
         if symbol == arcade.key.ESCAPE:
             self.window.show_view(self.previous_view)

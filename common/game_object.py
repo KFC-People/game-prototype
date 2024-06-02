@@ -17,7 +17,7 @@ class BaseMovementComponent(Component):
         self,
         parent: "GameObject",
         initial_position: Vec2d = Vec2d.zero(),
-        mass: float = 1,
+        mass: float = 1.0,
     ) -> None:
         super().__init__(parent)
 

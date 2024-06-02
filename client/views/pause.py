@@ -4,7 +4,9 @@ from client.views.options import OptionsView
 
 
 class PauseView(arcade.View):
-    def __init__(self, previous_view: arcade.View, window: arcade.Window = None):
+    def __init__(
+        self, previous_view: arcade.View, window: arcade.Window = None
+    ) -> None:
         super().__init__(window)
 
         self.previous_view = previous_view
@@ -15,13 +17,13 @@ class PauseView(arcade.View):
             "font_size": 24,
         }
 
-    def on_show_view(self):
+    def on_show_view(self) -> None:
         arcade.set_background_color(arcade.color.SMOKY_BLACK)
 
-    def on_update(self, delta_time: float):
+    def on_update(self, delta_time: float) -> None:
         pass
 
-    def on_draw(self):
+    def on_draw(self) -> None:
         self.clear()
 
         width, height = self.window.get_size()
@@ -44,7 +46,7 @@ class PauseView(arcade.View):
                 **self.font_config,
             )
 
-    def on_key_press(self, symbol: int, modifiers: int):
+    def on_key_press(self, symbol: int, modifiers: int) -> None:
         if symbol == arcade.key.O:
             self.window.show_view(OptionsView(self))
 

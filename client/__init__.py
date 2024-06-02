@@ -8,7 +8,7 @@ SCREEN_HEIGHT = 720
 SCREEN_TITLE = "typetypetype client"
 
 
-def run_game(update_rate: float = 1 / 60):
+def run_game(update_rate: float = 1 / 60) -> None:
     window = arcade.Window(
         width=SCREEN_WIDTH,
         height=SCREEN_HEIGHT,
