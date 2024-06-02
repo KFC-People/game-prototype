@@ -3,9 +3,9 @@ import arcade
 from client.views import GameView, SplashView
 
 
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
 SCREEN_TITLE = "typetypetype client"
+SCREEN_WIDTH = 1366
+SCREEN_HEIGHT = 768
 
 
 def run_game(update_rate: float = 1 / 60) -> None:

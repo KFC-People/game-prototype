@@ -30,11 +30,6 @@ class GameView(arcade.View):
 
         self.current_enemy: Enemy | None = None
         self.enemies: list[Enemy] = []
-        self.enemies.append(Enemy(Vec2d(500, 200), scale=2))
-        self.enemies.append(Enemy(Vec2d(700, 200), scale=2))
-        self.enemies.append(Enemy(Vec2d(500, 400), scale=2))
-        self.enemies.append(Enemy(Vec2d(700, 400), scale=2))
-
         self.background_layers = [
             arcade.load_texture(f"assets/backgrounds/city/{i}.png") for i in range(1, 6)
         ]
