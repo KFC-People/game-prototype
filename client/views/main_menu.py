@@ -1,6 +1,7 @@
 import arcade
 
 from client.views.options import OptionsView
+from client.views.server_list import ServerListView
 
 
 class MainMenuView(arcade.View):
@@ -25,7 +26,7 @@ class MainMenuView(arcade.View):
         for i, text in enumerate(
             [
                 "select an option:",
-                "press <i> to start the game",
+                "press <i> to open servers list",
                 "press <o> to open the options menu",
                 "press <q> to quit the game",
             ],
@@ -43,7 +44,7 @@ class MainMenuView(arcade.View):
             arcade.close_window()
 
         elif symbol == arcade.key.I:
-            self.window.show_view(self.window.game_view)
+            self.window.show_view(ServerListView())
 
         elif symbol == arcade.key.O:
             self.window.show_view(OptionsView(self))

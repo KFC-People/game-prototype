@@ -3,6 +3,7 @@ from pymunk import Vec2d
 
 from client.views.pause import PauseView
 from common.enemy import Enemy
+from common.game import Game
 from common.vehicle import Vehicle
 
 
@@ -10,39 +11,33 @@ class GameView(arcade.View):
     def __init__(self, window: arcade.Window = None) -> None:
         super().__init__(window)
 
+        self.game = None
+        self.connection_manager = None
+
         self.camera = None
         self.gui_camera = None
 
-        self.vehicle = None
-        self.enemies = None
-
         self.background_layers = []
         self.layer_positions = [0] * 5
-        self.layer_speeds = [0, 0.05, 0.1, 0.15, 0.2]
+        self.layer_speeds = [0.0, 0.05, 0.1, 0.15, 0.2]
 
     def on_show_view(self) -> None:
+        self.game = Game()
+
         self.camera = arcade.Camera(self.window.width, self.window.height)
         self.gui_camera = arcade.Camera(self.window.width, self.window.height)
 
         self.vehicle_screen_position = Vec2d(200, 135)
-        self.vehicle = Vehicle(self.vehicle_screen_position, mass=10, scale=2)
+        self.vehicle.movement_component.position = self.vehicle_screen_position
+        self.vehicle.graphics_component.scale = 2
         self.camera.move(self.vehicle_screen_position)
 
-        self.current_enemy: Enemy | None = None
-        self.enemies: list[Enemy] = []
         self.background_layers = [
             arcade.load_texture(f"assets/backgrounds/city/{i}.png") for i in range(1, 6)
         ]
 
     def on_update(self, delta_time: float) -> None:
-        self.vehicle.update(delta_time)
-
-        if self.current_enemy is not None and self.current_enemy.is_dead:
-            self.enemies.remove(self.current_enemy)
-            self.current_enemy = None
-
-        for enemy in self.enemies:
-            enemy.update(delta_time)
+        self.game.update(delta_time)
 
         camera_position = self.vehicle.position - self.vehicle_screen_position
         self.camera.move_to(camera_position, 0.1)
@@ -90,6 +85,7 @@ class GameView(arcade.View):
 
         for enemy in self.enemies:
             enemy.draw()
+
             arcade.draw_text(
                 enemy.prompt,
                 enemy.position.x - 25,
@@ -107,14 +103,12 @@ class GameView(arcade.View):
         if symbol == arcade.key.ESCAPE:
             self.window.show_view(PauseView(self))
 
-        elif " " <= (char := chr(symbol)) <= "~":
-            self.vehicle.handle_char(char)
+        self.game.on_input(symbol)
 
-            if self.current_enemy is None or not self.current_enemy.is_alive:
-                for enemy in self.enemies:
-                    if enemy.is_alive:
-                        self.current_enemy = enemy
-                        break
+    @property
+    def vehicle(self) -> Vehicle:
+        return self.game.vehicle
 
-            if self.current_enemy:
-                self.current_enemy.handle_char(char)
+    @property
+    def enemies(self) -> list[Enemy]:
+        return self.game.enemies

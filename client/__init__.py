@@ -1,7 +1,6 @@
 import arcade
 
-from client.views import GameView, SplashView
-
+from client.views import MainMenuView, SplashView
 
 SCREEN_TITLE = "typetypetype client"
 SCREEN_WIDTH = 1366
@@ -16,8 +15,7 @@ def run_game(update_rate: float = 1 / 60) -> None:
         update_rate=update_rate,
     )
 
-    window.game_view = GameView()
-    splash_view = SplashView()
+    splash_view = SplashView(MainMenuView())
 
     window.show_view(splash_view)
     arcade.run()

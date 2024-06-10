@@ -205,7 +205,9 @@ class Vehicle(GameObject):
         self.health = 100
 
         self.typing_component = TypingComponent(self)
-        self.movement_component = MovementComponent(self, mass=mass)
+        self.movement_component = MovementComponent(
+            self, initial_position=initial_position, mass=mass
+        )
         self.graphics_component = GraphicsComponent(
             self, initial_position=initial_position, scale=scale
         )

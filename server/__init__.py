@@ -1,5 +1,5 @@
-from server.server import Server
+from server.game_lobby import GameLobby
 
 
-def run():
-    Server().start()
+def run(update_rate: float = 1 / 60) -> None:
+    GameLobby(host="127.0.0.1", port=1234, update_rate=update_rate).run()

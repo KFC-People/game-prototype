@@ -24,3 +24,19 @@ Install `arcade`'s dependencies, then all required packages:
 sudo apt install python3 python3-pip libjpeg-dev zlib1g-dev
 poetry install
 ```
+
+### Development
+
+As a developer, you should also install pre-commit hooks:
+
+```bash
+poetry run pre-commit install
+poetry run pre-commit run -a
+```
+
+And to run the project:
+
+```bash
+poetry run python -m server
+poetry run python -m client
+```

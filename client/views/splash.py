@@ -1,10 +1,10 @@
 import arcade
 
-from client.views.main_menu import MainMenuView
-
 
 class SplashView(arcade.View):
-    def __init__(self, window: arcade.Window | None = None) -> None:
+    def __init__(
+        self, next_view: arcade.View, window: arcade.Window | None = None
+    ) -> None:
         super().__init__(window)
 
         self.font_config = {
@@ -20,6 +20,8 @@ class SplashView(arcade.View):
 
         self.cursor_visible = True
         self.cursor_blink_rate = 30
+
+        self.next_view = next_view
 
     def on_show_view(self) -> None:
         arcade.set_background_color(arcade.color.BLACK)
@@ -54,4 +56,4 @@ class SplashView(arcade.View):
 
     def on_key_press(self, symbol: int, *_) -> None:
         if symbol == arcade.key.I:
-            self.window.show_view(MainMenuView())
+            self.window.show_view(self.next_view)
