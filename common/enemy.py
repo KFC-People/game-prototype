@@ -126,9 +126,10 @@ class GraphicsComponent(BaseGraphicsComponent):
 
 class Enemy(GameObject):
     def __init__(
-        self, initial_position: Vec2d = Vec2d.zero(), scale: float = 1.0
+        self, id: int = None, initial_position: Vec2d = Vec2d.zero(), scale: float = 1.0
     ) -> None:
         super().__init__()
+        self.id = id or id(self)
 
         self.typing_component = TypingComponent(self)
         self.ai_movement_component = AIMovementComponent(
@@ -137,6 +138,12 @@ class Enemy(GameObject):
         self.graphics_component = GraphicsComponent(
             self, initial_position=initial_position, scale=scale
         )
+
+        self.components = [
+            self.typing_component,
+            self.ai_movement_component,
+            self.graphics_component,
+        ]
 
         self.state = State.IDLE
 

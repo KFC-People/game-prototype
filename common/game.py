@@ -4,12 +4,18 @@ from common.enemy import Enemy
 from common.vehicle import Vehicle
 
 
+class PlayerType:
+    DRIVER = 1
+    GUNNER = 2
+    HEALER = 3
+
+
 class Game:
     def __init__(self) -> None:
         self.vehicle = Vehicle(initial_position=Vec2d(0, 0), mass=10)
 
-        self.enemies: list[Enemy] = []
-        self.current_enemy = None
+        self.enemies: dict[int, Enemy] = {}
+        self.current_enemy: Enemy | None = None
 
     def update(self, delta_time: float) -> None:
         self.vehicle.update(delta_time)
@@ -21,15 +27,39 @@ class Game:
         for enemy in self.enemies:
             enemy.update(delta_time)
 
-    def on_input(self, key: int) -> None:
-        if " " <= (char := chr(key)) <= "~":
-            self.vehicle.handle_char(char)
+    def handle_player_key(self, player_type: int, key: int) -> None:
+        match player_type:
+            case PlayerType.DRIVER:
+                if " " <= (char := chr(key)) <= "~":
+                    self.vehicle.handle_char(char)
 
-            if self.current_enemy is None or not self.current_enemy.is_alive:
-                for enemy in self.enemies:
-                    if enemy.is_alive:
-                        self.current_enemy = enemy
-                        break
+            case PlayerType.GUNNER:
+                if " " <= (char := chr(key)) <= "~":
+                    if self.current_enemy is None or not self.current_enemy.is_alive:
+                        for enemy in self.enemies.values():
+                            if enemy.is_alive:
+                                self.current_enemy = enemy
+                                break
 
-            if self.current_enemy:
-                self.current_enemy.handle_char(char)
+                    if self.current_enemy is not None:
+                        self.current_enemy.handle_char(char)
+
+            case PlayerType.HEALER:
+                pass
+
+    def get_state(self) -> dict:
+        return {
+            "vehicle": self.vehicle.get_state(),
+            "enemies": {
+                enemy_id: enemy.get_state() for enemy_id, enemy in self.enemies.items()
+            },
+        }
+
+    def apply_state(self, state: dict) -> None:
+        self.vehicle.apply_state(state["vehicle"])
+
+        for enemy_id, enemy_state in state["enemies"].items():
+            if enemy_id not in self.enemies:
+                self.enemies.append(Enemy(id=enemy_id))
+
+            self.enemies[enemy_id].apply_state(enemy_state)

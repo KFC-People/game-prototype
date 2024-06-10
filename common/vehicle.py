@@ -59,8 +59,8 @@ class TypingComponent(Component):
         self.accuracy = 0
 
     def update(self, delta_time: float) -> None:
-        self._clear_history()
-        self.speed_wpm, self.accuracy = self._get_stats()
+        self.clear_history()
+        self.speed_wpm, self.accuracy = self.get_stats()
 
     def handle_char(self, char: str) -> None:
         if not self.prompt:
@@ -75,7 +75,7 @@ class TypingComponent(Component):
             KeyInput(char, char == self.prompt.pop(0), time.perf_counter())
         )
 
-    def _get_stats(self) -> tuple[float, float]:
+    def get_stats(self) -> tuple[float, float]:
         if not self.typing_history:
             return 0, 0
 
@@ -87,7 +87,7 @@ class TypingComponent(Component):
 
         return speed_wpm, accuracy
 
-    def _clear_history(self) -> None:
+    def clear_history(self) -> None:
         current_time = time.perf_counter()
 
         self.typing_history = [
@@ -95,6 +95,12 @@ class TypingComponent(Component):
             for key_input in self.typing_history
             if current_time - key_input.time < self.window_seconds
         ]
+
+    def get_state(self) -> dict:
+        return {"prompt": self.prompt}
+
+    def apply_state(self, state: dict) -> None:
+        self.prompt = state.get("prompt", self.prompt)
 
 
 class MovementComponent(BaseMovementComponent):
@@ -211,6 +217,12 @@ class Vehicle(GameObject):
         self.graphics_component = GraphicsComponent(
             self, initial_position=initial_position, scale=scale
         )
+
+        self.components = [
+            self.typing_component,
+            self.movement_component,
+            self.graphics_component,
+        ]
 
     def update(self, delta_time: float) -> None:
         if self.state == State.IDLE:

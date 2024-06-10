@@ -1,4 +1,9 @@
+import socket
+
 import arcade
+
+from client.views.game import GameView
+from common.connection import Connection
 
 
 class ServerListView(arcade.View):
@@ -23,9 +28,9 @@ class ServerListView(arcade.View):
 
         width, height = self.window.get_size()
 
-        for i, (ip, port) in enumerate(self.servers, start=2):
+        for i, (host, port) in enumerate(self.servers, start=2):
             arcade.draw_text(
-                f"{i - 2} - {ip}:{port}",
+                f"{i - 2} - {host}:{port}",
                 start_x=width / 2,
                 start_y=(10 - i) / 10 * height,
                 **self.font_config,
@@ -33,9 +38,7 @@ class ServerListView(arcade.View):
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         if 0 <= (i := symbol - 48) < len(self.servers):
-            ip, port = self.servers[i]
-            self.window.game_view.connect(ip, port)
-            self.window.show_view(self.window.game_view)
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect(self.servers[i])
 
-        else:
-            print("out of range")
+            self.window.show_view(GameView(Connection(s)))

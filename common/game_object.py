@@ -11,6 +11,12 @@ class Component:
     def update(self, delta_time: float) -> Any:
         raise NotImplementedError
 
+    def get_state(self) -> dict:
+        return {}
+
+    def apply_state(self, state: dict) -> None:
+        pass
+
 
 class BaseMovementComponent(Component):
     def __init__(
@@ -27,6 +33,16 @@ class BaseMovementComponent(Component):
         self.velocity = Vec2d.zero()
         self.acceleration = Vec2d.zero()
 
+    def get_state(self) -> dict:
+        return {
+            "position": self.position.int_tuple,
+            "velocity": self.velocity.int_tuple,
+        }
+
+    def apply_state(self, state: dict) -> None:
+        self.position = Vec2d(*state["position"])
+        self.velocity = Vec2d(*state["velocity"])
+
 
 class BaseGraphicsComponent(arcade.Sprite, Component):
     def __init__(self, parent: "GameObject", initial_position: Vec2d, **kwargs) -> None:
@@ -37,5 +53,20 @@ class BaseGraphicsComponent(arcade.Sprite, Component):
 
 
 class GameObject:
+    def __init__(self) -> None:
+        self.components: list[Component] = []
+
     def update(self, delta_time: float) -> Any:
         raise NotImplementedError
+
+    def get_state(self) -> dict:
+        state = {}
+
+        for component in self.components:
+            state.update(component.get_state())
+
+        return state
+
+    def apply_state(self, state: dict) -> None:
+        for component in self.components:
+            component.apply_state(state)
