@@ -1,3 +1,5 @@
+from enum import Enum, auto
+
 from arcade import Texture
 from pymunk import Vec2d
 
@@ -7,7 +9,6 @@ from common.game_object import (
     Component,
     GameObject,
 )
-from enum import Enum, auto
 from common.sprite_cache import SpriteCache
 
 
@@ -126,10 +127,10 @@ class GraphicsComponent(BaseGraphicsComponent):
 
 class Enemy(GameObject):
     def __init__(
-        self, id: int = None, initial_position: Vec2d = Vec2d.zero(), scale: float = 1.0
+        self, id: int, initial_position: Vec2d = Vec2d.zero(), scale: float = 1.0
     ) -> None:
         super().__init__()
-        self.id = id or id(self)
+        self.id = id
 
         self.typing_component = TypingComponent(self)
         self.ai_movement_component = AIMovementComponent(

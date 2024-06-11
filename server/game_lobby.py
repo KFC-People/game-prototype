@@ -3,24 +3,18 @@ import socket
 import time
 from typing import NoReturn
 
-from server.player import Player
+from client.views.game import PLAYER_LABELS
 from common.connection import Connection
 from common.game import Game, PlayerType
+from server.player import Player
 
 
 class GameLobby:
-    def __init__(
-        self,
-        host: str,
-        port: int,
-        is_blocking: bool = True,
-        update_rate: float = 1 / 10,
-    ) -> None:
+    def __init__(self, host: str, port: int, update_rate: float = 1 / 10) -> None:
         self.update_rate = update_rate
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        self.socket.setblocking(is_blocking)
         self.socket.bind((host, port))
         self.socket.listen(3)
 
@@ -71,8 +65,30 @@ class GameLobby:
             self.game.handle_player_key(player_type, player_input)
             self.players[player_type].last_input = json_message
 
+    def game_loop(self) -> None:
+        current_time = time.perf_counter()
+        accumulator = 0
+
+        while all(self.players.values()):
+            new_time = time.perf_counter()
+            frame_time = new_time - current_time
+            current_time = new_time
+
+            accumulator += frame_time
+
+            while accumulator >= self.update_rate:
+                self.check_enemies()
+                self.game.update(self.update_rate)
+                self.broadcast({"state": self.game.get_state()})
+
+                accumulator -= self.update_rate
+
+    def check_enemies(self) -> None:
+        if len(self.game.enemies) < 4:
+            self.game.spawn_random_enemy()
+
     def broadcast(self, event: dict) -> None:
-        for player in self.players.values():
+        for role, player in self.players.items():
             if not player:
                 continue
 
@@ -87,20 +103,4 @@ class GameLobby:
                 player.connection.send(message)
 
             except ConnectionError:
-                print("Connection lost")
-
-    def game_loop(self) -> None:
-        current_time = time.perf_counter()
-        accumulator = 0
-
-        while all(self.players.values()):
-            new_time = time.perf_counter()
-            frame_time = new_time - current_time
-            current_time = new_time
-
-            accumulator += frame_time
-
-            while accumulator >= self.update_rate:
-                self.game.update(self.update_rate)
-                self.broadcast({"state": self.game.get_state()})
-                accumulator -= self.update_rate
+                print(f"Connection with {PLAYER_LABELS[role]} lost")

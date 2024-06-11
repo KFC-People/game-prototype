@@ -8,14 +8,8 @@ from pymunk import Vec2d
 from client.views.pause import PauseView
 from common.connection import Connection
 from common.enemy import Enemy
-from common.game import Game, PlayerType
+from common.game import PLAYER_LABELS, Game, PlayerType
 from common.vehicle import Vehicle
-
-PLAYER_LABELS = {
-    PlayerType.DRIVER: "driver",
-    PlayerType.GUNNER: "gunner",
-    PlayerType.HEALER: "healer",
-}
 
 
 class GameView(arcade.View):
@@ -65,8 +59,6 @@ class GameView(arcade.View):
             for event in self.unacknowledged.queue:
                 self.game.handle_player_key(self.player_type, event["input"])
                 self.game.update(event["timestamp"] - last_timestamp)
-
-            print(self.unacknowledged)
 
         elif event := json_message.get("event"):
             if event == "pause":
@@ -126,6 +118,7 @@ class GameView(arcade.View):
                 font_name="FiraCode Nerd Font",
                 bold=True,
             )
+
             return
 
         height = self.window.height
@@ -162,7 +155,7 @@ class GameView(arcade.View):
                 bold=True,
             )
 
-        for enemy in self.enemies:
+        for enemy in list(self.enemies.values()):
             enemy.draw()
 
             if self.player_type == PlayerType.GUNNER:

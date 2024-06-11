@@ -16,7 +16,6 @@ class Connection(namedtuple("Connection", ["socket"])):
             while True:
                 message = self.receive()
                 self.on_message(message)
-                print(message)
 
         finally:
             pass
