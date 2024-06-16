@@ -50,21 +50,28 @@ class GameView(arcade.View):
                     continue
 
                 break
-
             if not self.unacknowledged.queue:
+                self.fast_forward(time.time() - json_message["timestamp"])
                 return
 
             last_timestamp = self.unacknowledged.queue[0]["timestamp"]
 
             for event in self.unacknowledged.queue:
                 self.game.handle_player_key(self.player_type, event["input"])
-                self.game.update(event["timestamp"] - last_timestamp)
+                self.fast_forward(event["timestamp"] - last_timestamp)
+
+                last_timestamp = event["timestamp"]
 
         elif event := json_message.get("event"):
             if event == "pause":
                 self.is_running = False
             elif event == "start":
                 self.is_running = True
+
+    def fast_forward(self, duration: float, update_rate: float = 1 / 60) -> None:
+        while duration >= update_rate:
+            self.game.update(update_rate)
+            duration -= update_rate
 
     def on_show_view(self) -> None:
         self.game = Game()
