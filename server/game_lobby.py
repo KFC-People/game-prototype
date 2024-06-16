@@ -66,11 +66,11 @@ class GameLobby:
             self.players[player_type].last_input = json_message
 
     def game_loop(self) -> None:
-        current_time = time.perf_counter()
+        current_time = time.time()
         accumulator = 0
 
         while all(self.players.values()):
-            new_time = time.perf_counter()
+            new_time = time.time()
             frame_time = new_time - current_time
             current_time = new_time
 
@@ -84,7 +84,7 @@ class GameLobby:
                 accumulator -= self.update_rate
 
     def check_enemies(self) -> None:
-        if len(self.game.enemies) < 4:
+        if len(self.game.enemies) < 1:
             self.game.spawn_random_enemy()
 
     def broadcast(self, event: dict) -> None:
@@ -93,12 +93,8 @@ class GameLobby:
                 continue
 
             try:
-                message = json.dumps(
-                    {
-                        "timestamp": player.last_input.get("timestamp", time.time()),
-                        **event,
-                    }
-                ).encode()
+                player_timestamp = player.last_input.pop("timestamp", time.time())
+                message = json.dumps({"timestamp": player_timestamp, **event}).encode()
 
                 player.connection.send(message)
 

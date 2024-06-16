@@ -72,7 +72,7 @@ class TypingComponent(Component):
             self.prompt.pop(0)
 
         self.typing_history.append(
-            KeyInput(char, char == self.prompt.pop(0), time.perf_counter())
+            KeyInput(char, char == self.prompt.pop(0), time.time())
         )
 
     def get_stats(self) -> tuple[float, float]:
@@ -88,7 +88,7 @@ class TypingComponent(Component):
         return speed_wpm, accuracy
 
     def clear_history(self) -> None:
-        current_time = time.perf_counter()
+        current_time = time.time()
 
         self.typing_history = [
             key_input
