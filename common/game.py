@@ -69,6 +69,8 @@ class Game:
         self.vehicle.apply_state(state["vehicle"])
 
         for enemy_id, enemy_state in state["enemies"].items():
+            enemy_id = int(enemy_id)
+
             if enemy_id not in self.enemies:
                 self.enemies[enemy_id] = Enemy(id=enemy_id, scale=2.0)
 
