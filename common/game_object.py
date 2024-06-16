@@ -35,8 +35,8 @@ class BaseMovementComponent(Component):
 
     def get_state(self) -> dict:
         return {
-            "position": self.position.int_tuple,
-            "velocity": self.velocity.int_tuple,
+            "position": (self.position.x, self.position.y),
+            "velocity": (self.velocity.x, self.velocity.y),
         }
 
     def apply_state(self, state: dict) -> None:
@@ -49,7 +49,7 @@ class BaseGraphicsComponent(arcade.Sprite, Component):
         super().__init__(**kwargs)
 
         self.parent = parent
-        self.center_x, self.center_y = initial_position.int_tuple
+        self.center_x, self.center_y = initial_position.x, initial_position.y
 
 
 class GameObject:
