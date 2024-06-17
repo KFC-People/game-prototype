@@ -1,0 +1,7 @@
+FROM ubuntu:jammy-20240530
+
+RUN mkdir /game
+
+WORKDIR /game
+
+COPY
