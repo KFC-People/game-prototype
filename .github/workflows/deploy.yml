@@ -1,5 +1,9 @@
 name: Deploy TypeTypeType to GCP
 
+env:
+  SERVICE_NAME: typetypetyep
+
+
 on:
   push:
     branches:
@@ -40,3 +44,17 @@ jobs:
 
       - name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
+
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to GCP VM
+        run:
+          ssh -o StrictHostKeyChecking=no ${SSH_USER}@${GCP_VM_IP} "docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_TOKEN} && docker pull ${DOCKERHUB_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
