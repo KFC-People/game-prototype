@@ -51,21 +51,22 @@ class GameView(arcade.View):
                     continue
 
                 break
+
             if not self.unacknowledged.queue:
-                self.fast_forward(time.time() - json_message["timestamp"])
                 return
 
             last_timestamp = self.unacknowledged.queue[0]["timestamp"]
 
             for event in self.unacknowledged.queue:
                 self.game.handle_player_key(self.player_type, event["input"])
-                self.fast_forward(event["timestamp"] - last_timestamp)
+                self.game.update(event["timestamp"] - last_timestamp)
 
                 last_timestamp = event["timestamp"]
 
         elif event := json_message.get("event"):
             if event == "pause":
                 self.is_running = False
+
             elif event == "start":
                 self.is_running = True
 
@@ -113,7 +114,7 @@ class GameView(arcade.View):
                 self.window.height / 2,
                 arcade.color.WHITE,
                 font_size=30,
-                font_name="FiraCode Nerd Font",
+                font_name="monospace",
                 bold=True,
             )
 
@@ -123,7 +124,7 @@ class GameView(arcade.View):
                 self.window.height / 2 - 50,
                 arcade.color.WHITE,
                 font_size=30,
-                font_name="FiraCode Nerd Font",
+                font_name="monospace",
                 bold=True,
             )
 
@@ -159,7 +160,7 @@ class GameView(arcade.View):
                 38,
                 arcade.color.WHITE,
                 font_size=25,
-                font_name="FiraCode Nerd Font",  # TODO: load font from assets
+                font_name="monospace",  # TODO: load font from assets
                 bold=True,
             )
 
@@ -173,7 +174,7 @@ class GameView(arcade.View):
                     enemy.position.y + 50,
                     arcade.color.WHITE,
                     font_size=16,
-                    font_name="FiraCode Nerd Font",
+                    font_name="monospace",
                     bold=True,
                 )
 
