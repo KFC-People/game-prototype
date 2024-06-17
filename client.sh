@@ -1,7 +1,5 @@
 #!/bin/bash
 
-sed -i 's/127\.0\.0\.1/34.32.65.191/g' ./client/views/server_list.py
-
 docker build -t game-client -f Dockerfile.client .
 
 xhost +local:docker

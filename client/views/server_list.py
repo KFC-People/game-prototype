@@ -21,7 +21,7 @@ class ServerListView(arcade.View):
         self.servers = self.get_servers()
 
     def get_servers(self) -> list[tuple[str, int]]:
-        return [("127.0.0.1", 1234)]
+        return [("34.32.68.138", 1234)]
 
     def on_draw(self) -> None:
         self.clear()
