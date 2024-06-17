@@ -92,8 +92,12 @@ class GameLobby:
                 continue
 
             try:
-                player_timestamp = player.last_input.pop("timestamp", time.time())
-                message = json.dumps({"timestamp": player_timestamp, **event}).encode()
+                message = json.dumps(
+                    {
+                        "timestamp": player.last_input.get("timestamp", time.time()),
+                        **event,
+                    }
+                ).encode()
 
                 player.connection.send(message)
 
