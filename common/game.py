@@ -48,6 +48,7 @@ class Game:
                         for enemy in list(self.enemies.values()):
                             if enemy.is_alive:
                                 self.current_enemy = enemy
+                                self.current_enemy.select()
                                 break
 
                     if self.current_enemy is not None:

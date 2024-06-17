@@ -172,8 +172,8 @@ class GameView(arcade.View):
             if self.player_type == PlayerType.GUNNER:
                 arcade.draw_text(
                     enemy.prompt,
-                    enemy.position.x - 25,
-                    enemy.position.y + 50,
+                    enemy.position.x - 40,
+                    enemy.position.y - 50,
                     arcade.color.WHITE,
                     font_size=16,
                     font_name="monospace",

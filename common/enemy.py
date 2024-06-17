@@ -1,3 +1,4 @@
+import random
 from enum import Enum, auto
 
 from arcade import Texture
@@ -16,6 +17,7 @@ word_generator = RandomWords()
 
 
 class State(Enum):
+    ACTIVE = auto()
     IDLE = auto()
     DYING = auto()
     DEAD = auto()
@@ -51,10 +53,36 @@ class AIMovementComponent(BaseMovementComponent):
         if not self.parent.is_alive:
             self.acceleration += Vec2d(-0.1, -0.4) * self.mass
 
+        if self.parent.state == State.ACTIVE:
+            self.acceleration += Vec2d(random.randint(-5, 5), random.randint(-5, 5))
+
+        self.check_speed()
+        self.check_borders()
         self.velocity += self.acceleration
         self.position += self.velocity
 
         self.acceleration = Vec2d.zero()
+
+    def check_speed(self) -> None:
+        if self.velocity.length > 10:
+            self.velocity = self.velocity.normalized() * 10
+
+    def check_borders(self) -> None:
+        if self.position.x < 0:
+            self.position = Vec2d(0, self.position.y)
+            self.velocity = Vec2d(-1 * self.velocity.x, self.velocity.y)
+
+        if self.position.y < 0:
+            self.position = Vec2d(self.position.x, 0)
+            self.velocity = Vec2d(self.velocity.x, -1 * self.velocity.y)
+
+        if self.position.x > 1300:
+            self.position = Vec2d(1300, self.position.y)
+            self.velocity = Vec2d(-1 * self.velocity.x, self.velocity.y)
+
+        if self.position.y > 700:
+            self.position = Vec2d(self.position.x, 700)
+            self.velocity = Vec2d(self.velocity.x, -1 * self.velocity.y)
 
 
 class GraphicsComponent(BaseGraphicsComponent):
@@ -113,9 +141,16 @@ class GraphicsComponent(BaseGraphicsComponent):
 
         self.current_frame %= self.sprite_count * self.frames_per_sprite
 
-        self.texture = self.backward_texture[
-            self.current_frame // self.frames_per_sprite
-        ]
+        match self.parent.state:
+            case State.ACTIVE:
+                self.texture = self.forward_texture[
+                    self.current_frame // self.frames_per_sprite
+                ]
+
+            case State.IDLE:
+                self.texture = self.backward_texture[
+                    self.current_frame // self.frames_per_sprite
+                ]
 
     @property
     def idle_texture(self) -> list[Texture]:
@@ -170,6 +205,9 @@ class Enemy(GameObject):
 
     def draw(self) -> None:
         self.graphics_component.draw()
+
+    def select(self) -> None:
+        self.state = State.ACTIVE
 
     @property
     def position(self) -> Vec2d:
