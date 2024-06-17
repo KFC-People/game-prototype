@@ -57,6 +57,6 @@ jobs:
 
       - name: Deploy to GCP VM
         run: |
-          ssh -o StrictHostKeyChecking=no ${GCE_SSH_USER}@${GCE_INSTANCE_IP} "\
+          ssh -i ${{ secrets.GCE_SSH_PRIVATE_KEY }} ${GCE_SSH_USER}@${GCE_INSTANCE_IP} \
             docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_TOKEN} && \
             docker pull ${DOCKERHUB_USERNAME}/${DOCKER_IMAGE_NAME}:latest"
