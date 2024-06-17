@@ -22,7 +22,8 @@ class GameView(arcade.View):
         self.connection = connection
         self.unacknowledged = Queue()
 
-        message = json.loads(self.connection.receive())
+        role = self.connection.receive()
+        message = json.loads(role)
         self.player_type = message["player_type"]
 
         self.connection.on_message = lambda message: self.handle_server_message(message)

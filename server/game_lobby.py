@@ -3,7 +3,6 @@ import socket
 import time
 from typing import NoReturn
 
-from client.views.game import PLAYER_LABELS
 from common.connection import Connection
 from common.game import Game, PlayerType
 from server.player import Player
@@ -99,4 +98,4 @@ class GameLobby:
                 player.connection.send(message)
 
             except ConnectionError:
-                print(f"Connection with {PLAYER_LABELS[role]} lost")
+                print("Connection with player lost")
