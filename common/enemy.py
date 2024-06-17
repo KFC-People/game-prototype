@@ -54,10 +54,10 @@ class AIMovementComponent(BaseMovementComponent):
             self.acceleration += Vec2d(-0.1, -0.4) * self.mass
 
         if self.parent.state == State.ACTIVE:
+            self.check_speed()
+            self.check_borders()
             self.acceleration += Vec2d(random.randint(-5, 5), random.randint(-5, 5))
 
-        self.check_speed()
-        self.check_borders()
         self.velocity += self.acceleration
         self.position += self.velocity
 
@@ -208,6 +208,12 @@ class Enemy(GameObject):
 
     def select(self) -> None:
         self.state = State.ACTIVE
+
+    def _get_state(self) -> dict:
+        return {"state": self.state.value}
+
+    def _apply_state(self, state: dict) -> None:
+        self.state = State(state.get("state")) or self.state
 
     @property
     def position(self) -> Vec2d:

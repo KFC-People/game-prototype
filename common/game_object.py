@@ -64,12 +64,21 @@ class GameObject:
 
     def get_state(self) -> dict:
         state = {}
+        state.update(self._get_state())
 
         for component in self.components:
             state.update(component.get_state())
 
         return state
 
+    def _get_state(self) -> dict:
+        return {}
+
     def apply_state(self, state: dict) -> None:
+        self._apply_state(state)
+
         for component in self.components:
             component.apply_state(state)
+
+    def _apply_state(self, state: dict) -> None:
+        pass

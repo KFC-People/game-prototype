@@ -59,9 +59,12 @@ class TypingComponent(Component):
         if char != " " and self.prompt and self.prompt[0] == " ":
             self.prompt.pop(0)
 
-        self.typing_history.append(
-            KeyInput(char, char == self.prompt.pop(0), time.time())
-        )
+        is_correct = char == self.prompt.pop(0)
+
+        if not is_correct:
+            self.parent.health -= 1
+
+        self.typing_history.append(KeyInput(char, is_correct, time.time()))
 
     def get_stats(self) -> tuple[float, float]:
         if not self.typing_history:
@@ -247,6 +250,12 @@ class Vehicle(GameObject):
 
     def draw(self) -> None:
         self.graphics_component.draw()
+
+    def _get_state(self) -> dict:
+        return {"health": self.health}
+
+    def _apply_state(self, state: dict) -> None:
+        self.health = state.get("health", self.health)
 
     @property
     def position(self) -> Vec2d:

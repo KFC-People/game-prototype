@@ -155,6 +155,16 @@ class GameView(arcade.View):
             arcade.color.DARK_MIDNIGHT_BLUE,
         )
 
+        arcade.draw_text(
+            str(self.vehicle.health),
+            width / 2 - 15,
+            height - 80,
+            arcade.color.BLACK,
+            font_size=64,
+            font_name="monospace",
+            bold=True,
+        )
+
         if self.player_type == PlayerType.DRIVER:
             arcade.draw_text(
                 self.vehicle.prompt,
