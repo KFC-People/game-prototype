@@ -32,8 +32,8 @@ jobs:
         run: |
           docker build \
             -t ${{ secrets.DOCKER_IMAGE_NAME }}:latest \
-            -t game-server\
-            -f Dockerfile.server
+            -t game-server \
+            -f Dockerfile.server .
 
       - name: Tag Docker image
         run: docker tag ${{ secrets.DOCKER_IMAGE_NAME }}:latest ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
