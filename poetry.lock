@@ -560,6 +560,16 @@ files = [
 ]
 
 [[package]]
+name = "quotes"
+version = "0.0.3"
+description = "Small python lib that contains a few quotes of famous people"
+optional = false
+python-versions = "*"
+files = [
+    {file = "quotes-0.0.3-py2.py3-none-any.whl", hash = "sha256:36af7d75971de4a10ec348455d3fcd79e4dc04bd889d3583c114bcee0f5b833e"},
+]
+
+[[package]]
 name = "ruff"
 version = "0.4.7"
 description = "An extremely fast Python linter and code formatter, written in Rust."
@@ -619,4 +629,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "77d59428d7c2b738e626d21f5421ea038184e7df06da95abd4bf76bbe2b7f9da"
+content-hash = "21425aba89b6dcc2f11386b7e505b9ba2d905c0639b0b1a2373e35f5864f0f82"

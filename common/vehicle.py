@@ -4,6 +4,7 @@ from enum import Enum, auto
 
 import arcade
 from pymunk import Vec2d
+from quotes import Quotes
 
 from common.game_object import (
     BaseGraphicsComponent,
@@ -12,6 +13,8 @@ from common.game_object import (
     GameObject,
 )
 from common.utils import map_exponential
+
+quotes = Quotes()
 
 
 class State(Enum):
@@ -37,23 +40,8 @@ class TypingComponent(Component):
         self.window_seconds = window_seconds
         self.chars_per_word = chars_per_word
 
-        self.typing_history = []
-        self.prompt = []
-        self.prompt = list(
-            "hello world lorem ipsum dolor sit amet consectetur adipiscing elit "
-        )
-        self.prompt += list(
-            "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua "
-        )
-        self.prompt += list(
-            "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat "
-        )
-        self.prompt += list(
-            "duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur "
-        )
-        self.prompt += list(
-            "excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum "
-        )
+        self.typing_history: list[KeyInput] = []
+        self.prompt: list[str] = list(quotes.random()[1])
 
         self.speed_wpm = 0
         self.accuracy = 0
@@ -63,9 +51,9 @@ class TypingComponent(Component):
         self.speed_wpm, self.accuracy = self.get_stats()
 
     def handle_char(self, char: str) -> None:
-        if not self.prompt:
-            # TODO: renew prompt
-            return
+        if len(self.prompt) < 20:
+            self.prompt.append(" ")
+            self.prompt.extend(list(quotes.random()[1]))
 
         # ignore spaces between words
         if char != " " and self.prompt and self.prompt[0] == " ":

@@ -59,7 +59,9 @@ class GameView(arcade.View):
 
             for event in self.unacknowledged.queue:
                 self.game.handle_player_key(self.player_type, event["input"])
-                self.game.update(event["timestamp"] - last_timestamp)
+
+                if event["timestamp"] - last_timestamp > 0:
+                    self.game.update(event["timestamp"] - last_timestamp)
 
                 last_timestamp = event["timestamp"]
 
