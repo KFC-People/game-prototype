@@ -2,6 +2,7 @@ from enum import Enum, auto
 
 from arcade import Texture
 from pymunk import Vec2d
+from random_word import RandomWords
 
 from common.game_object import (
     BaseGraphicsComponent,
@@ -10,6 +11,8 @@ from common.game_object import (
     GameObject,
 )
 from common.sprite_cache import SpriteCache
+
+word_generator = RandomWords()
 
 
 class State(Enum):
@@ -22,7 +25,7 @@ class TypingComponent(Component):
     def __init__(self, parent: GameObject) -> None:
         super().__init__(parent)
 
-        self.prompt = list("verylongwordhere")
+        self.prompt = list(word_generator.get_random_word().lower())
 
     def handle_char(self, char: str) -> None:
         if len(self.prompt) == 0:

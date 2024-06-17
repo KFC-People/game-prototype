@@ -82,6 +82,6 @@ class Game:
 
     def spawn_random_enemy(self) -> None:
         _id = IDGenerator.next_id()
-        position = Vec2d(random.randint(400, 900), random.randint(400, 600))
+        position = Vec2d(random.randint(200, 1200), random.randint(200, 750))
 
         self.enemies[_id] = Enemy(id=_id, initial_position=position)
