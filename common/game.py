@@ -73,7 +73,10 @@ class Game:
 
             if enemy_id not in self.enemies:
                 self.enemies[enemy_id] = Enemy(id=enemy_id, scale=2.0)
+                self.enemies[enemy_id].apply_state(enemy_state)
 
+            enemy_state.pop("position")
+            enemy_state.pop("velocity")
             self.enemies[enemy_id].apply_state(enemy_state)
 
     def spawn_random_enemy(self) -> None:

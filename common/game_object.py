@@ -40,8 +40,11 @@ class BaseMovementComponent(Component):
         }
 
     def apply_state(self, state: dict) -> None:
-        self.position = Vec2d(*state["position"])
-        self.velocity = Vec2d(*state["velocity"])
+        if position := state.get("position"):
+            self.position = Vec2d(*position)
+
+        if velocity := state.get("velocity"):
+            self.velocity = Vec2d(*velocity)
 
 
 class BaseGraphicsComponent(arcade.Sprite, Component):

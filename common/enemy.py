@@ -31,6 +31,12 @@ class TypingComponent(Component):
         if char == self.prompt[0]:
             self.prompt.pop(0)
 
+    def get_state(self) -> dict:
+        return {"prompt": self.prompt}
+
+    def apply_state(self, state: dict) -> None:
+        self.prompt = state.get("prompt", self.prompt)
+
 
 class AIMovementComponent(BaseMovementComponent):
     def __init__(
