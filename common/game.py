@@ -10,13 +10,13 @@ from common.vehicle import Vehicle
 class PlayerType:
     DRIVER = 1
     GUNNER = 2
-    HEALER = 3
+    # HEALER = 3
 
 
 PLAYER_LABELS = {
     PlayerType.DRIVER: "driver",
     PlayerType.GUNNER: "gunner",
-    PlayerType.HEALER: "healer",
+    # PlayerType.HEALER: "healer",
 }
 
 
@@ -54,8 +54,8 @@ class Game:
                     if self.current_enemy is not None:
                         self.current_enemy.handle_char(char)
 
-            case PlayerType.HEALER:
-                pass
+            # case PlayerType.HEALER:
+            #     pass
 
     def get_state(self) -> dict:
         return {

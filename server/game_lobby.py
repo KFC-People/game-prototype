@@ -15,13 +15,13 @@ class GameLobby:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         self.socket.bind((host, port))
-        self.socket.listen(3)
+        self.socket.listen(2)
 
         self.game = Game()
         self.players: dict[int, Player | None] = {
             PlayerType.DRIVER: None,
             PlayerType.GUNNER: None,
-            PlayerType.HEALER: None,
+            # PlayerType.HEALER: None,
         }
 
     def run(self) -> NoReturn:
