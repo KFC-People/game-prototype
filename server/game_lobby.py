@@ -83,7 +83,11 @@ class GameLobby:
                 accumulator -= self.update_rate
 
     def check_enemies(self) -> None:
-        if len(self.game.enemies) < 1:
+        for enemy in list(self.game.enemies.values()):
+            if enemy.is_dead:
+                del self.game.enemies[enemy.id]
+
+        if len(self.game.enemies) < 5:
             self.game.spawn_random_enemy()
 
     def broadcast(self, event: dict) -> None:

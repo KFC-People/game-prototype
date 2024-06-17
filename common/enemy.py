@@ -95,8 +95,8 @@ class GraphicsComponent(BaseGraphicsComponent):
         self.current_frame += 1
 
         if self.parent.state == State.DYING:
-            self.current_frame %= 8 * 12
-            current_sprite = self.current_frame // 12
+            self.current_frame %= 8 * self.frames_per_sprite
+            current_sprite = self.current_frame // self.frames_per_sprite
 
             if current_sprite == 7:
                 self.parent.state = State.DEAD

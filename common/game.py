@@ -24,14 +24,13 @@ class Game:
     def __init__(self) -> None:
         self.vehicle = Vehicle(initial_position=Vec2d(0, 0), mass=10)
 
-        self.enemies: dict[int, Enemy] = {}
+        self.enemies: dict[str | int, Enemy] = {}
         self.current_enemy: Enemy | None = None
 
     def update(self, delta_time: float) -> None:
         self.vehicle.update(delta_time)
 
         if self.current_enemy is not None and self.current_enemy.is_dead:
-            del self.enemies[self.current_enemy.id]
             self.current_enemy = None
 
         for enemy in list(self.enemies.values()):
@@ -68,9 +67,11 @@ class Game:
     def apply_state(self, state: dict) -> None:
         self.vehicle.apply_state(state["vehicle"])
 
-        for enemy_id, enemy_state in state["enemies"].items():
-            enemy_id = int(enemy_id)
+        for enemy_id in list(self.enemies.keys()):
+            if enemy_id not in state["enemies"]:
+                del self.enemies[enemy_id]
 
+        for enemy_id, enemy_state in state["enemies"].items():
             if enemy_id not in self.enemies:
                 self.enemies[enemy_id] = Enemy(id=enemy_id, scale=2.0)
                 self.enemies[enemy_id].apply_state(enemy_state)
@@ -81,6 +82,6 @@ class Game:
 
     def spawn_random_enemy(self) -> None:
         _id = IDGenerator.next_id()
-        position = Vec2d(random.randint(300, 700), random.randint(400, 900))
+        position = Vec2d(random.randint(400, 900), random.randint(400, 600))
 
         self.enemies[_id] = Enemy(id=_id, initial_position=position)
